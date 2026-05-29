@@ -1,0 +1,474 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Cairo', 'Segoe UI', system-ui, sans-serif;
+}
+
+body {
+    background: #eef2f7;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* شاشة تسجيل الدخول */
+.login-screen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, #1e3c72, #2a5298);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.login-card {
+    background: white;
+    padding: 40px 30px;
+    border-radius: 40px;
+    width: 90%;
+    max-width: 400px;
+    box-shadow: 0 25px 50px rgba(0,0,0,0.3);
+    text-align: center;
+}
+
+.login-card h2 {
+    margin-bottom: 25px;
+    color: #1e3c72;
+}
+
+.login-card input {
+    width: 100%;
+    padding: 14px;
+    margin: 10px 0;
+    border: 2px solid #ddd;
+    border-radius: 60px;
+    font-size: 1rem;
+    outline: none;
+    transition: border-color 0.3s;
+}
+
+.login-card input:focus {
+    border-color: #2a5298;
+}
+
+.login-card button {
+    width: 100%;
+    padding: 14px;
+    background: #2a5298;
+    color: white;
+    border: none;
+    border-radius: 60px;
+    font-size: 1.1rem;
+    font-weight: bold;
+    cursor: pointer;
+    margin-top: 15px;
+    transition: transform 0.2s, background 0.3s;
+}
+
+.login-card button:hover {
+    background: #1e3c72;
+    transform: translateY(-2px);
+}
+
+.error-msg {
+    color: red;
+    margin-top: 10px;
+    font-size: 0.85rem;
+}
+
+/* التطبيق الرئيسي */
+.main-app {
+    display: none;
+    width: 100%;
+    min-height: 100vh;
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+}
+
+/* الشريط العلوي */
+.top-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 25px;
+    background: rgba(0,0,0,0.6);
+    backdrop-filter: blur(8px);
+    color: white;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.left-group {
+    display: flex;
+    gap: 12px;
+}
+
+.settings-btn, .add-camp-btn, .logout-btn {
+    background: white;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.2s;
+}
+
+.settings-btn:hover, .add-camp-btn:hover, .logout-btn:hover {
+    transform: scale(1.1);
+}
+
+.logout-btn {
+    background: #fee2e2;
+    color: #b91c1c;
+}
+
+.camp-logo {
+    background: white;
+    border-radius: 60px;
+    padding: 5px 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: #1e3c72;
+    font-weight: bold;
+}
+
+.camp-logo img {
+    max-height: 45px;
+    max-width: 100px;
+}
+
+/* العناوين */
+.main-title {
+    text-align: center;
+    font-size: 2.5rem;
+    margin: 30px 0 20px;
+    color: #1e2a3e;
+    text-shadow: 2px 2px 5px rgba(0,0,0,0.2);
+    background: rgba(255,255,255,0.7);
+    padding: 10px;
+    border-radius: 60px;
+    width: fit-content;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.camp-info {
+    text-align: center;
+    background: rgba(0,0,0,0.7);
+    backdrop-filter: blur(4px);
+    padding: 12px;
+    margin: 0 20px 20px;
+    border-radius: 60px;
+    font-weight: bold;
+    color: white;
+}
+
+/* شريط البحث */
+.search-bar {
+    width: 98%;
+    margin: 20px auto;
+    display: flex;
+    gap: 15px;
+    flex-wrap: wrap;
+    justify-content: space-between;
+}
+
+.search-bar input {
+    flex: 1;
+    padding: 12px 20px;
+    border-radius: 60px;
+    border: 2px solid #ddd;
+    font-size: 1rem;
+    outline: none;
+    transition: border-color 0.3s;
+}
+
+.search-bar input:focus {
+    border-color: #2a5298;
+}
+
+.stats {
+    background: rgba(42, 82, 152, 0.9);
+    color: white;
+    padding: 12px 20px;
+    border-radius: 60px;
+    font-weight: bold;
+}
+
+/* الجدول */
+.table-wrapper {
+    width: 98%;
+    margin: 20px auto;
+    overflow-x: auto;
+    border-radius: 24px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+}
+
+.data-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: rgba(255,255,255,0.95);
+    min-width: 800px;
+}
+
+.data-table th, .data-table td {
+    border: 1px solid #ccc;
+    padding: 12px 8px;
+    text-align: center;
+    vertical-align: middle;
+}
+
+.data-table th {
+    background: #2c3e66;
+    color: white;
+    font-weight: bold;
+}
+
+.data-table input {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #aaa;
+    border-radius: 20px;
+    text-align: center;
+    transition: border-color 0.3s;
+}
+
+.data-table input:focus {
+    border-color: #2a5298;
+    outline: none;
+}
+
+.qr-cell {
+    min-width: 120px;
+}
+
+.qr-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-width: 100px;
+    min-height: 100px;
+}
+
+.qr-placeholder {
+    width: 90px;
+    height: 90px;
+    background: #f0f0f0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    color: gray;
+    border-radius: 12px;
+    margin: 0 auto;
+    text-align: center;
+}
+
+.delete-row-btn, .download-qr-btn {
+    background: #dc2626;
+    color: white;
+    border: none;
+    padding: 6px 10px;
+    border-radius: 40px;
+    cursor: pointer;
+    font-weight: bold;
+    margin: 3px;
+    font-size: 0.75rem;
+    transition: transform 0.2s, background 0.3s;
+}
+
+.delete-row-btn:hover, .download-qr-btn:hover {
+    transform: scale(1.05);
+}
+
+.download-qr-btn {
+    background: #16a34a;
+}
+
+.download-qr-btn:hover {
+    background: #15803d;
+}
+
+/* الأزرار السفلية */
+.bottom-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin: 20px 0 30px;
+    flex-wrap: wrap;
+}
+
+.action-btn {
+    background: #2a5298;
+    color: white;
+    padding: 10px 25px;
+    border: none;
+    border-radius: 60px;
+    font-size: 0.95rem;
+    font-weight: bold;
+    cursor: pointer;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    transition: transform 0.2s, background 0.3s;
+}
+
+.action-btn:hover {
+    transform: translateY(-2px);
+    background: #1e3c72;
+}
+
+.danger-btn {
+    background: #b91c1c;
+}
+
+.danger-btn:hover {
+    background: #991b1b;
+}
+
+.green-btn {
+    background: #15803d;
+}
+
+.green-btn:hover {
+    background: #166534;
+}
+
+/* النوافذ المنبثقة */
+.modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.8);
+    justify-content: center;
+    align-items: center;
+    z-index: 2000;
+}
+
+.modal-content {
+    background: white;
+    padding: 25px;
+    border-radius: 32px;
+    width: 90%;
+    max-width: 500px;
+    max-height: 80vh;
+    overflow-y: auto;
+}
+
+.modal-content input, .modal-content select {
+    width: 100%;
+    padding: 10px;
+    margin: 8px 0;
+    border-radius: 40px;
+    border: 1px solid #ccc;
+}
+
+.modal-content button {
+    background: #2a5298;
+    color: white;
+    border: none;
+    padding: 10px;
+    border-radius: 40px;
+    margin-top: 10px;
+    cursor: pointer;
+    width: 100%;
+    transition: background 0.3s;
+}
+
+.modal-content button:hover {
+    background: #1e3c72;
+}
+
+/* شريط التقدم */
+.progress-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.9);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 3000;
+}
+
+.progress-card {
+    background: white;
+    padding: 40px;
+    border-radius: 32px;
+    text-align: center;
+    min-width: 300px;
+}
+
+.spinner {
+    border: 4px solid #f3f3f3;
+    border-top: 4px solid #2a5298;
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    animation: spin 1s linear infinite;
+    margin: 0 auto 20px;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.progress-bar {
+    width: 100%;
+    height: 20px;
+    background: #ddd;
+    border-radius: 10px;
+    overflow: hidden;
+    margin: 15px 0;
+}
+
+.progress-fill {
+    height: 100%;
+    background: #2a5298;
+    width: 0%;
+    transition: width 0.3s;
+}
+
+/* استجابة للأجهزة المحمولة */
+@media (max-width: 700px) {
+    .data-table th, .data-table td {
+        font-size: 12px;
+        padding: 8px 4px;
+    }
+    
+    .delete-row-btn, .download-qr-btn {
+        padding: 4px 6px;
+        font-size: 10px;
+    }
+    
+    .qr-placeholder {
+        width: 70px;
+        height: 70px;
+    }
+    
+    .action-btn {
+        padding: 8px 15px;
+        font-size: 0.85rem;
+    }
+    
+    .main-title {
+        font-size: 1.5rem;
+    }
+}
