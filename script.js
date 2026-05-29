@@ -70,10 +70,6 @@
         }
     }
     
-    function validatePhone(phone) {
-        return phone && phone.replace(/\D/g, '').length >= 10;
-    }
-
     // ===================== إنشاء QR (مستقر تماماً) =====================
     async function generateSingleQR(rowIndex, camper) {
         return new Promise((resolve) => {
@@ -377,6 +373,7 @@
         const user = document.getElementById("loginUsername").value.trim();
         const pass = document.getElementById("loginPassword").value.trim();
         
+        // التحقق من الحساب الرئيسي
         if (user === mainAccount.username && pass === mainAccount.password) {
             currentUser = user;
             isMain = true;
@@ -387,6 +384,7 @@
             applySettings();
             setupSearch();
         } else {
+            // التحقق من الحسابات الفرعية (باستخدام البريد الإلكتروني كاسم مستخدم)
             const found = subAccounts.find(acc => acc.username === user && acc.password === pass);
             if (found) {
                 currentUser = user;
@@ -397,8 +395,12 @@
                 renderTable();
                 applySettings();
                 setupSearch();
+                // إظهار رسالة ترحيب بالحساب الفرعي
+                setTimeout(() => {
+                    alert(`👋 مرحباً ${found.fullName || user}\n🎭 الدور: ${found.role}\n📧 البريد الإلكتروني: ${user}`);
+                }, 100);
             } else { 
-                document.getElementById("loginError").innerText = "اسم المستخدم أو كلمة المرور غير صحيحة"; 
+                document.getElementById("loginError").innerText = "❌ اسم المستخدم أو كلمة المرور غير صحيحة"; 
             }
         }
     };
@@ -443,62 +445,132 @@
         }
     };
     
-    // ===================== الحسابات الفرعية =====================
+    // ===================== الحسابات الفرعية (محدث) =====================
     document.getElementById("addSubAccountBtn").onclick = function() {
         if (!isMain) { 
-            alert("الحسابات الفرعية لا تملك صلاحية إضافة حسابات"); 
+            alert("⚠️ الحسابات الفرعية لا تملك صلاحية إضافة حسابات"); 
             return; 
         }
         document.getElementById("subAccountModal").style.display = "flex";
     };
     
     document.getElementById("saveSubAccountBtn").onclick = function() {
-        const fullName = document.getElementById("subName").value;
+        const fullName = document.getElementById("subName").value.trim();
         const role = document.getElementById("subRole").value;
-        const email = document.getElementById("subEmail").value;
+        const email = document.getElementById("subEmail").value.trim();
         const pass = document.getElementById("subPass").value;
+        const confirmPass = document.getElementById("subConfirmPass").value;
         
-        if (!fullName || !pass) { 
-            alert("الاسم والرقم السري مطلوبان"); 
+        // التحقق من البريد الإلكتروني
+        if (!email || !pass) { 
+            alert("⚠️ البريد الإلكتروني والرقم السري مطلوبان"); 
             return; 
         }
         
-        subAccounts.push({ username: fullName, password: pass, role: role, email: email });
+        if (!fullName) {
+            alert("⚠️ الرجاء إدخال الاسم واللقب");
+            return;
+        }
+        
+        // التحقق من تطابق الرقم السري
+        if (pass !== confirmPass) {
+            alert("⚠️ الرقم السري وتأكيد الرقم السري غير متطابقين!");
+            return;
+        }
+        
+        // التحقق من طول الرقم السري
+        if (pass.length < 4) {
+            alert("⚠️ الرقم السري يجب أن يكون 4 أحرف على الأقل");
+            return;
+        }
+        
+        // التحقق من صيغة البريد الإلكتروني
+        const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailPattern.test(email)) {
+            alert("⚠️ الرجاء إدخال بريد إلكتروني صحيح (مثال: name@domain.com)");
+            return;
+        }
+        
+        // التحقق من عدم وجود البريد مسبقاً
+        const existingAccount = subAccounts.find(acc => acc.username === email);
+        if (existingAccount) {
+            alert("⚠️ هذا البريد الإلكتروني مستخدم بالفعل!");
+            return;
+        }
+        
+        // إضافة الحساب مع استخدام البريد الإلكتروني كاسم مستخدم
+        subAccounts.push({ 
+            username: email,        // البريد الإلكتروني هو اسم المستخدم لتسجيل الدخول
+            password: pass,         // الرقم السري المستخدم لتسجيل الدخول
+            role: role, 
+            email: email,
+            fullName: fullName
+        });
+        
         localStorage.setItem("subAccounts", JSON.stringify(subAccounts));
-        alert("✅ تمت إضافة الحساب الفرعي بنجاح");
+        
+        // عرض معلومات الحساب للمستخدم
+        alert(`✅ تم إنشاء الحساب بنجاح!
+
+┌─────────────────────────────
+│ 📧 البريد الإلكتروني (اسم المستخدم): ${email}
+│ 🔑 الرقم السري: ${pass}
+│ 👤 الاسم: ${fullName}
+│ 🎭 الدور: ${role}
+└─────────────────────────────
+
+📌 يمكن للحساب الجديد تسجيل الدخول باستخدام:
+   البريد الإلكتروني: ${email}
+   الرقم السري: ${pass}`);
+        
+        // تنظيف الحقول
         document.getElementById("subAccountModal").style.display = "none";
         document.getElementById("subName").value = "";
         document.getElementById("subPass").value = "";
+        document.getElementById("subConfirmPass").value = "";
         document.getElementById("subEmail").value = "";
     };
     
     document.getElementById("listSubAccountsBtn").onclick = function() {
         if (!isMain) { 
-            alert("غير مسموح، هذه الخاصية للحساب الأساسي فقط"); 
+            alert("⚠️ غير مسموح، هذه الخاصية للحساب الأساسي فقط"); 
             return; 
         }
         
         if (subAccounts.length === 0) {
-            alert("لا يوجد حسابات فرعية حالياً");
+            alert("📋 لا يوجد حسابات فرعية حالياً");
             return;
         }
         
         let list = "📋 قائمة الحسابات الفرعية:\n\n";
         subAccounts.forEach((acc, idx) => { 
-            list += `${idx+1}- ${acc.username} (${acc.role}) - ${acc.email || "بدون بريد"}\n`; 
+            list += `${idx+1}. ┌─────────────────────\n`;
+            list += `   │ 👤 الاسم: ${acc.fullName || acc.username}\n`;
+            list += `   │ 📧 البريد: ${acc.email || acc.username}\n`;
+            list += `   │ 🎭 الدور: ${acc.role}\n`;
+            list += `   │ 🔑 الرقم السري: ${acc.password}\n`;
+            list += `   └─────────────────────\n\n`;
         });
         
-        const del = prompt(list + "\n\n✏️ أدخل رقم الحساب للحذف (أو إلغاء)");
+        const del = prompt(list + "\n✏️ أدخل رقم الحساب للحذف (أو إلغاء)");
         if (del && !isNaN(del) && del > 0 && del <= subAccounts.length) {
-            if (confirm(`هل تريد حذف حساب ${subAccounts[del-1].username}؟`)) {
+            const accountToDelete = subAccounts[del-1];
+            if (confirm(`⚠️ هل تريد حذف حساب ${accountToDelete.fullName || accountToDelete.username}؟\n📧 البريد: ${accountToDelete.email}\n🎭 الدور: ${accountToDelete.role}`)) {
                 subAccounts.splice(del-1, 1);
                 localStorage.setItem("subAccounts", JSON.stringify(subAccounts));
-                alert("✅ تم الحذف بنجاح");
+                alert("✅ تم حذف الحساب بنجاح");
             }
         }
     };
     
-    document.getElementById("closeSubModal").onclick = () => document.getElementById("subAccountModal").style.display = "none";
+    document.getElementById("closeSubModal").onclick = () => {
+        document.getElementById("subAccountModal").style.display = "none";
+        // تنظيف الحقول
+        document.getElementById("subName").value = "";
+        document.getElementById("subPass").value = "";
+        document.getElementById("subConfirmPass").value = "";
+        document.getElementById("subEmail").value = "";
+    };
     
     // ===================== معلومات المخيم =====================
     document.getElementById("addCampInfoBtn").onclick = () => {
@@ -544,6 +616,13 @@
     
     document.getElementById("closeCampModal").onclick = () => document.getElementById("campInfoModal").style.display = "none";
     
+    // الضغط على Enter في شاشة تسجيل الدخول
+    document.getElementById("loginPassword").addEventListener("keypress", function(e) {
+        if (e.key === "Enter") {
+            document.getElementById("doLoginBtn").click();
+        }
+    });
+    
     // ===================== التحميل الأولي =====================
     loadCampDataToUI();
     renderTable();
@@ -554,7 +633,7 @@
     window.addEventListener("beforeunload", (e) => {
         if (campersData.length > 0) {
             e.preventDefault();
-            e.returnValue = "هل أنت متأكد من مغادرة الصفحة؟ قد تفقد البيانات غير المحفوظة.";
+            e.returnValue = "⚠️ هل أنت متأكد من مغادرة الصفحة؟ قد تفقد البيانات غير المحفوظة.";
         }
     });
 })();

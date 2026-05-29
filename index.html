@@ -3,7 +3,7 @@
 
   <head>
     <meta charset="UTF-8">
-    <title>كود QR</title>
+    <title>كود QR نهائي</title>
     <link rel="stylesheet" href="./style.css">
 
   </head>
@@ -24,7 +24,7 @@
 <div id="loginScreen" class="login-screen">
     <div class="login-card">
         <h2>🔐 تسجيل الدخول</h2>
-        <input type="text" id="loginUsername" placeholder="اسم المستخدم">
+        <input type="text" id="loginUsername" placeholder="اسم المستخدم (البريد الإلكتروني)">
         <input type="password" id="loginPassword" placeholder="كلمة المرور">
         <button id="doLoginBtn">دخول</button>
         <div id="loginError" class="error-msg"></div>
@@ -81,21 +81,26 @@
         <hr>
         <button id="addSubAccountBtn" class="action-btn">➕ إضافة حساب فرعي</button>
         <button id="listSubAccountsBtn" class="action-btn" style="background:gray;">📋 قائمة الحسابات الفرعية</button>
-        <button id="closeSettings">إغلاق</button>
+        <button id="closeSettings">❌ إغلاق</button>
     </div>
 </div>
 
 <div id="subAccountModal" class="modal">
     <div class="modal-content">
         <h3>➕ إضافة حساب فرعي</h3>
-        <input type="text" id="subName" placeholder="الاسم واللقب">
+        <input type="text" id="subName" placeholder="الاسم واللقب (للتوثيق)" required>
         <select id="subRole">
-            <option>منشط</option>
-            <option>مدير</option>
-            <option>مدير فرعي</option>
+            <option value="منشط">منشط</option>
+            <option value="مدير">مدير</option>
+            <option value="مدير فرعي">مدير فرعي</option>
         </select>
-        <input type="email" id="subEmail" placeholder="البريد الإلكتروني">
-        <input type="password" id="subPass" placeholder="الرقم السري">
+        <input type="email" id="subEmail" placeholder="البريد الإلكتروني (اسم المستخدم)" required>
+        <input type="password" id="subPass" placeholder="الرقم السري" required>
+        <input type="password" id="subConfirmPass" placeholder="تأكيد الرقم السري" required>
+        <small style="color: #666; display: block; margin: 5px 0;">
+            📌 سيتم استخدام البريد الإلكتروني كاسم مستخدم لتسجيل الدخول<br>
+            🔑 الرقم السري الذي تدخله هو نفسه المستخدم لتسجيل الدخول
+        </small>
         <button id="saveSubAccountBtn">💾 حفظ الحساب</button>
         <button id="closeSubModal">❌ إلغاء</button>
     </div>

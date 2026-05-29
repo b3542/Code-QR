@@ -393,6 +393,11 @@ body {
     background: #1e3c72;
 }
 
+.modal-content small {
+    font-size: 12px;
+    color: #666;
+}
+
 /* شريط التقدم */
 .progress-overlay {
     position: fixed;
