@@ -1,5 +1,4 @@
 // ===================== الحسابات الأساسية =====================
-// الحساب الرئيسي (ثابت)
 const MAIN_ACCOUNT = {
     username: "bilalayeb1996",
     password: "bilalayeb1996",
@@ -9,44 +8,48 @@ const MAIN_ACCOUNT = {
 };
 
 // ===================== دوال التخزين =====================
-// حفظ جميع البيانات في localStorage
 function saveAllData() {
     const allAccounts = getAllAccounts();
     localStorage.setItem("allAccounts", JSON.stringify(allAccounts));
 }
 
-// الحصول على جميع الحسابات (الرئيسي + الفرعية)
 function getAllAccounts() {
     const subAccounts = JSON.parse(localStorage.getItem("subAccounts") || "[]");
     return [MAIN_ACCOUNT, ...subAccounts];
 }
 
-// الحصول على حسابات فرعية فقط
 function getSubAccounts() {
     return JSON.parse(localStorage.getItem("subAccounts") || "[]");
 }
 
-// حفظ الحسابات الفرعية
 function saveSubAccounts(subAccounts) {
     localStorage.setItem("subAccounts", JSON.stringify(subAccounts));
     saveAllData();
 }
 
-// حفظ بيانات مستخدم معين (المصطافين ومعلومات المخيم)
+// ===================== دوال حفظ بيانات المستخدم (تم إصلاحها) =====================
 function saveUserData(username, campers, campInfo) {
+    if (!username) return;
+    
     const userData = {
-        campers: campers,
-        campInfo: campInfo,
+        campers: campers || [],
+        campInfo: campInfo || { name: "مخيم الأمل", manager: "غير محدد", phone: "---", logo: "" },
         lastUpdated: new Date().toISOString()
     };
     localStorage.setItem(`userData_${username}`, JSON.stringify(userData));
+    console.log(`✅ تم حفظ بيانات المستخدم ${username} في ${new Date().toLocaleTimeString()}`);
 }
 
-// تحميل بيانات مستخدم معين
 function loadUserData(username) {
+    if (!username) {
+        return { campers: [], campInfo: { name: "مخيم الأمل", manager: "غير محدد", phone: "---", logo: "" } };
+    }
+    
     const data = localStorage.getItem(`userData_${username}`);
     if (data) {
-        return JSON.parse(data);
+        const parsed = JSON.parse(data);
+        console.log(`✅ تم تحميل بيانات المستخدم ${username}`);
+        return parsed;
     }
     return {
         campers: [],
@@ -55,9 +58,9 @@ function loadUserData(username) {
 }
 
 // ===================== المتغيرات العامة =====================
-let currentUser = null;      // المستخدم الحالي
-let campersData = [];        // بيانات المصطافين
-let campData = {             // بيانات المخيم
+let currentUser = null;
+let campersData = [];
+let campData = {
     name: "مخيم الأمل",
     manager: "غير محدد",
     phone: "---",
@@ -65,6 +68,7 @@ let campData = {             // بيانات المخيم
 };
 let fontSize = localStorage.getItem("titleFontSize") || 40;
 let backgroundImage = localStorage.getItem("bgImage") || "";
+let saveTimeout = null; // للحفظ المؤجل
 
 // عناصر DOM
 const loginScreen = document.getElementById("loginScreen");
@@ -101,6 +105,31 @@ function escapeHtml(str) {
         if (m === '>') return '&gt;';
         return m;
     });
+}
+
+// ===================== وظيفة الحفظ التلقائي (تم إصلاحها) =====================
+function autoSave() {
+    if (currentUser) {
+        // حفظ فوري
+        saveUserData(currentUser.username, campersData, campData);
+        
+        // إظهار مؤقت للحفظ (اختياري)
+        const saveIndicator = document.getElementById("saveIndicator");
+        if (saveIndicator) {
+            saveIndicator.style.opacity = "1";
+            setTimeout(() => {
+                if (saveIndicator) saveIndicator.style.opacity = "0";
+            }, 1000);
+        }
+    }
+}
+
+// حفظ مع تأخير (لتجنب الحفظ المتكرر)
+function debounceAutoSave() {
+    if (saveTimeout) clearTimeout(saveTimeout);
+    saveTimeout = setTimeout(() => {
+        autoSave();
+    }, 500);
 }
 
 // ===================== إنشاء QR =====================
@@ -168,7 +197,7 @@ function renderTable() {
     tableBody.innerHTML = "";
     
     if (campersData.length === 0) {
-        tableBody.innerHTML = `<tr><td colspan='7' style='text-align:center'>⚠️ لا توجد بيانات، أضف صفاً جديداً</td></tr>`;
+        tableBody.innerHTML = `<tr><td colspan='7' style='text-align:center'>⚠️ لا توجد بيانات، أضف صفاً جديداً</td></table>`;
         updateStats();
         return;
     }
@@ -197,8 +226,8 @@ function renderTable() {
                 supervisor: supInp.value,
                 supervisorPhone: phoneInp.value
             };
-            // حفظ البيانات تلقائياً
-            saveUserData(currentUser.username, campersData, campData);
+            // حفظ تلقائي عند التعديل
+            debounceAutoSave();
         };
         
         nameInp.addEventListener("input", updateCamper);
@@ -210,7 +239,7 @@ function renderTable() {
             if (confirm("حذف هذا الشخص؟")) {
                 campersData.splice(idx, 1);
                 renderTable();
-                saveUserData(currentUser.username, campersData, campData);
+                autoSave(); // حفظ فوري عند الحذف
             }
         });
         
@@ -245,14 +274,14 @@ function updateStats() {
 function addEmptyRow() {
     campersData.push({ name: "", dob: "", supervisor: "", supervisorPhone: "" });
     renderTable();
-    saveUserData(currentUser.username, campersData, campData);
+    autoSave();
 }
 
 function deleteAllRows() {
     if (confirm("⚠️ هل أنت متأكد من حذف جميع بيانات المصطافين؟")) {
         campersData = [];
         renderTable();
-        saveUserData(currentUser.username, campersData, campData);
+        autoSave();
     }
 }
 
@@ -306,28 +335,107 @@ async function downloadAllQRCodes() {
     alert("✅ تم تحميل جميع الأكواد");
 }
 
+// ===================== دوال تصدير واستيراد Excel =====================
 function exportToExcel() {
     if (campersData.length === 0) {
         alert("لا توجد بيانات للتصدير");
         return;
     }
     
-    let csv = "اسم المصطاف,تاريخ الميلاد,المنشط المسؤول,هاتف المنشط\n";
+    // إنشاء مصفوفة للبيانات
+    const excelData = [
+        ["اسم المصطاف", "تاريخ الميلاد", "المنشط المسؤول", "هاتف المنشط"]
+    ];
+    
     campersData.forEach(camper => {
-        csv += `"${camper.name}",${camper.dob},"${camper.supervisor}","${camper.supervisorPhone}"\n`;
+        excelData.push([
+            camper.name || "",
+            camper.dob || "",
+            camper.supervisor || "",
+            camper.supervisorPhone || ""
+        ]);
     });
     
-    const blob = new Blob(["\uFEFF" + csv], { type: "text/csv;charset=utf-8;" });
-    const link = document.createElement("a");
-    const url = URL.createObjectURL(blob);
-    link.href = url;
-    link.setAttribute("download", "بيانات_المخيم.csv");
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    URL.revokeObjectURL(url);
+    // إنشاء ورقة عمل
+    const ws = XLSX.utils.aoa_to_sheet(excelData);
+    
+    // ضبط عرض الأعمدة
+    ws['!cols'] = [{wch:25}, {wch:15}, {wch:20}, {wch:20}];
+    
+    // إنشاء مصنف
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "بيانات المخيم");
+    
+    // تصدير الملف
+    const fileName = `بيانات_المخيم_${campData.name}_${new Date().toLocaleDateString('ar')}.xlsx`;
+    XLSX.writeFile(wb, fileName);
     
     alert("✅ تم تصدير البيانات بنجاح");
+}
+
+function importExcel(file) {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        
+        reader.onload = function(e) {
+            try {
+                const data = new Uint8Array(e.target.result);
+                const workbook = XLSX.read(data, { type: 'array' });
+                const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+                const rows = XLSX.utils.sheet_to_json(firstSheet, { header: 1, defval: "" });
+                
+                if (!rows || rows.length < 2) {
+                    reject(new Error("الملف فارغ أو لا يحتوي على بيانات"));
+                    return;
+                }
+                
+                const importedCampers = [];
+                // تخطي الصف الأول (العناوين)
+                for (let i = 1; i < rows.length; i++) {
+                    const row = rows[i];
+                    if (row.length >= 1 && row[0] && row[0].toString().trim() !== "") {
+                        importedCampers.push({
+                            name: row[0]?.toString().trim() || "",
+                            dob: row[1] ? formatDateForInput(row[1]) : "",
+                            supervisor: row[2]?.toString().trim() || "",
+                            supervisorPhone: row[3]?.toString().trim() || ""
+                        });
+                    }
+                }
+                
+                resolve(importedCampers);
+            } catch (error) {
+                reject(error);
+            }
+        };
+        
+        reader.onerror = function() {
+            reject(new Error("فشل قراءة الملف"));
+        };
+        
+        reader.readAsArrayBuffer(file);
+    });
+}
+
+function formatDateForInput(dateValue) {
+    if (!dateValue) return "";
+    
+    // محاولة تحويل التاريخ
+    try {
+        let date = new Date(dateValue);
+        if (isNaN(date.getTime())) {
+            // محاولة قراءة التاريخ كنص
+            const dateStr = dateValue.toString();
+            const parts = dateStr.split(/[-/]/);
+            if (parts.length === 3) {
+                return `${parts[2]}-${parts[1]}-${parts[0]}`;
+            }
+            return "";
+        }
+        return date.toISOString().split('T')[0];
+    } catch (e) {
+        return "";
+    }
 }
 
 // ===================== دوال الواجهة =====================
@@ -356,9 +464,8 @@ function applySettings() {
 }
 
 function logout() {
-    // حفظ البيانات قبل الخروج
     if (currentUser) {
-        saveUserData(currentUser.username, campersData, campData);
+        autoSave(); // حفظ قبل الخروج
     }
     currentUser = null;
     loginScreen.style.display = "flex";
@@ -387,18 +494,15 @@ function setupSearch() {
 }
 
 // ===================== إدارة الحسابات الفرعية =====================
-// إضافة حساب فرعي جديد
 function addSubAccount(fullName, username, password, role) {
     const subAccounts = getSubAccounts();
     
-    // التحقق من عدم وجود اسم المستخدم مسبقاً
     const existing = subAccounts.find(acc => acc.username === username);
     if (existing) {
         alert("⚠️ اسم المستخدم موجود مسبقاً!");
         return false;
     }
     
-    // إضافة الحساب الجديد
     subAccounts.push({
         username: username,
         password: password,
@@ -413,7 +517,6 @@ function addSubAccount(fullName, username, password, role) {
     return true;
 }
 
-// حذف حساب فرعي
 function deleteSubAccount(username) {
     let subAccounts = getSubAccounts();
     const index = subAccounts.findIndex(acc => acc.username === username);
@@ -421,17 +524,13 @@ function deleteSubAccount(username) {
     if (index !== -1) {
         subAccounts.splice(index, 1);
         saveSubAccounts(subAccounts);
-        
-        // حذف بيانات المستخدم
         localStorage.removeItem(`userData_${username}`);
-        
         alert(`✅ تم حذف الحساب ${username} بنجاح`);
         return true;
     }
     return false;
 }
 
-// عرض جميع الحسابات الفرعية
 function showAllSubAccounts() {
     const subAccounts = getSubAccounts();
     const accountsListDiv = document.getElementById("accountsList");
@@ -456,7 +555,7 @@ function showAllSubAccounts() {
             deleteBtn.onclick = () => {
                 if (confirm(`⚠️ هل أنت متأكد من حذف حساب ${acc.fullName}؟\nسيتم حذف جميع بياناته بشكل نهائي.`)) {
                     deleteSubAccount(acc.username);
-                    showAllSubAccounts(); // تحديث العرض
+                    showAllSubAccounts();
                 }
             };
             
@@ -469,13 +568,11 @@ function showAllSubAccounts() {
 
 // ===================== تسجيل الدخول =====================
 function login(username, password) {
-    // التحقق من الحساب الرئيسي
     if (username === MAIN_ACCOUNT.username && password === MAIN_ACCOUNT.password) {
         currentUser = MAIN_ACCOUNT;
         return true;
     }
     
-    // التحقق من الحسابات الفرعية
     const subAccounts = getSubAccounts();
     const subUser = subAccounts.find(acc => acc.username === username && acc.password === password);
     
@@ -498,22 +595,18 @@ document.getElementById("doLoginBtn").onclick = () => {
     }
     
     if (login(username, password)) {
-        // تحميل بيانات المستخدم
         const userData = loadUserData(currentUser.username);
-        campersData = userData.campers;
-        campData = userData.campInfo;
+        campersData = userData.campers || [];
+        campData = userData.campInfo || { name: "مخيم الأمل", manager: "غير محدد", phone: "---", logo: "" };
         
-        // عرض التطبيق
         loginScreen.style.display = "none";
         mainAppDiv.style.display = "block";
         
-        // تحديث الواجهة
         loadCampDataToUI();
         renderTable();
         applySettings();
         setupSearch();
         
-        // رسالة ترحيب
         setTimeout(() => {
             alert(`👋 مرحباً ${currentUser.fullName}\n🎭 الدور: ${currentUser.role}`);
         }, 100);
@@ -522,7 +615,6 @@ document.getElementById("doLoginBtn").onclick = () => {
     }
 };
 
-// الضغط على Enter
 document.getElementById("loginPassword").addEventListener("keypress", (e) => {
     if (e.key === "Enter") document.getElementById("doLoginBtn").click();
 });
@@ -533,6 +625,53 @@ document.getElementById("deleteAllRowsBtn").onclick = () => deleteAllRows();
 document.getElementById("generateQRBtn").onclick = () => generateAllQRs();
 document.getElementById("downloadAllQrBtn").onclick = () => downloadAllQRCodes();
 document.getElementById("exportExcelBtn").onclick = () => exportToExcel();
+
+// زر استيراد Excel
+document.getElementById("importExcelBtn").onclick = () => {
+    document.getElementById("importExcelModal").style.display = "flex";
+};
+
+document.getElementById("confirmImportBtn").onclick = async () => {
+    const fileInput = document.getElementById("excelFileInput");
+    const file = fileInput.files[0];
+    
+    if (!file) {
+        alert("⚠️ الرجاء اختيار ملف Excel أولاً");
+        return;
+    }
+    
+    showProgress(true, "جاري استيراد البيانات...", 0);
+    
+    try {
+        const importedCampers = await importExcel(file);
+        
+        if (importedCampers.length === 0) {
+            alert("⚠️ لم يتم العثور على بيانات في الملف");
+            showProgress(false);
+            return;
+        }
+        
+        // إضافة البيانات المستوردة إلى البيانات الحالية
+        campersData.push(...importedCampers);
+        renderTable();
+        autoSave();
+        
+        document.getElementById("importExcelModal").style.display = "none";
+        fileInput.value = "";
+        
+        showProgress(false);
+        alert(`✅ تم استيراد ${importedCampers.length} سجل بنجاح!`);
+    } catch (error) {
+        showProgress(false);
+        alert("❌ خطأ في استيراد الملف: " + error.message);
+    }
+};
+
+document.getElementById("closeImportModal").onclick = () => {
+    document.getElementById("importExcelModal").style.display = "none";
+    document.getElementById("excelFileInput").value = "";
+};
+
 document.getElementById("logoutBtn").onclick = () => logout();
 
 // ===================== الإعدادات =====================
@@ -573,7 +712,6 @@ document.getElementById("fullscreenToggle").onclick = () => {
 
 // ===================== إدارة الحسابات الفرعية =====================
 document.getElementById("addSubAccountBtn").onclick = () => {
-    // فقط الحساب الرئيسي يمكنه إضافة حسابات فرعية
     if (currentUser && currentUser.username === MAIN_ACCOUNT.username) {
         document.getElementById("subAccountModal").style.display = "flex";
     } else {
@@ -605,7 +743,6 @@ document.getElementById("saveSubAccountBtn").onclick = () => {
     
     addSubAccount(fullName, username, password, role);
     
-    // تنظيف الحقول
     document.getElementById("subName").value = "";
     document.getElementById("subUsername").value = "";
     document.getElementById("subPassword").value = "";
@@ -614,7 +751,6 @@ document.getElementById("saveSubAccountBtn").onclick = () => {
 };
 
 document.getElementById("listSubAccountsBtn").onclick = () => {
-    // فقط الحساب الرئيسي يمكنه عرض الحسابات الفرعية
     if (currentUser && currentUser.username === MAIN_ACCOUNT.username) {
         showAllSubAccounts();
     } else {
@@ -652,7 +788,7 @@ document.getElementById("saveCampInfoBtn").onclick = () => {
         const reader = new FileReader();
         reader.onload = function(e) {
             campData.logo = e.target.result;
-            saveUserData(currentUser.username, campersData, campData);
+            autoSave();
             loadCampDataToUI();
             if (campersData.length > 0) {
                 setTimeout(() => generateAllQRs(), 500);
@@ -660,7 +796,7 @@ document.getElementById("saveCampInfoBtn").onclick = () => {
         };
         reader.readAsDataURL(logoFile);
     } else {
-        saveUserData(currentUser.username, campersData, campData);
+        autoSave();
         loadCampDataToUI();
         if (campersData.length > 0) {
             generateAllQRs();
@@ -674,10 +810,23 @@ document.getElementById("closeCampModal").onclick = () => {
     document.getElementById("campInfoModal").style.display = "none";
 };
 
+// ===================== حفظ تلقائي عند إغلاق الصفحة =====================
+window.addEventListener("beforeunload", () => {
+    if (currentUser) {
+        autoSave();
+    }
+});
+
 // ===================== التحميل الأولي =====================
 applySettings();
 
-// التحقق من وجود بيانات أولية
 if (!localStorage.getItem("subAccounts")) {
     localStorage.setItem("subAccounts", "[]");
 }
+
+// إضافة مؤشر حفظ (اختياري)
+const saveIndicator = document.createElement("div");
+saveIndicator.id = "saveIndicator";
+saveIndicator.style.cssText = "position:fixed; bottom:20px; right:20px; background:#15803d; color:white; padding:8px 16px; border-radius:40px; font-size:12px; opacity:0; transition:opacity 0.3s; z-index:9999;";
+saveIndicator.innerHTML = "💾 تم الحفظ";
+document.body.appendChild(saveIndicator);

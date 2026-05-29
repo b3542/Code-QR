@@ -304,6 +304,7 @@ body {
     font-weight: bold;
     cursor: pointer;
     box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    transition: transform 0.2s;
 }
 
 .action-btn:hover {
@@ -359,6 +360,10 @@ body {
     margin-top: 10px;
     cursor: pointer;
     width: 100%;
+}
+
+.modal-content ul {
+    text-align: right;
 }
 
 .modal-content small {

@@ -3,7 +3,7 @@
 
   <head>
     <meta charset="UTF-8">
-    <title>Code qr نهائي</title>
+    <title>Code qr نهائي1</title>
     <link rel="stylesheet" href="./style.css">
 
   </head>
@@ -17,6 +17,8 @@
     <title>تطبيق كود QR - نظام إدارة المخيمات</title>
     <link rel="stylesheet" href="style.css">
     <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.1/build/qrcode.min.js"></script>
+    <!-- مكتبة لقراءة ملفات Excel -->
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 </head>
 <body>
 
@@ -70,8 +72,26 @@
         <button id="fillFormBtn" class="action-btn">📝 إضافة صف</button>
         <button id="generateQRBtn" class="action-btn">✨ إنشاء QR للجميع</button>
         <button id="deleteAllRowsBtn" class="action-btn danger-btn">🗑️ حذف الكل</button>
-        <button id="downloadAllQrBtn" class="action-btn green-btn">💾 تحميل كل الأكواد</button>
         <button id="exportExcelBtn" class="action-btn">📊 تصدير Excel</button>
+        <button id="importExcelBtn" class="action-btn" style="background:#8B5CF6;">📂 استيراد Excel</button>
+        <button id="downloadAllQrBtn" class="action-btn green-btn">💾 تحميل كل الأكواد</button>
+    </div>
+</div>
+
+<!-- نافذة استيراد Excel -->
+<div id="importExcelModal" class="modal">
+    <div class="modal-content">
+        <h3>📂 استيراد بيانات من Excel</h3>
+        <p style="margin: 10px 0; color: #666;">⚠️ يجب أن يحتوي ملف Excel على الأعمدة التالية بالترتيب:</p>
+        <ul style="margin: 10px 20px; color: #555;">
+            <li>العمود A: اسم المصطاف</li>
+            <li>العمود B: تاريخ الميلاد</li>
+            <li>العمود C: المنشط المسؤول</li>
+            <li>العمود D: هاتف المنشط</li>
+        </ul>
+        <input type="file" id="excelFileInput" accept=".xlsx, .xls, .csv" style="margin: 15px 0;">
+        <button id="confirmImportBtn" class="action-btn" style="background:#8B5CF6;">✅ استيراد البيانات</button>
+        <button id="closeImportModal" class="danger-btn">❌ إلغاء</button>
     </div>
 </div>
 
