@@ -3,7 +3,7 @@
 
   <head>
     <meta charset="UTF-8">
-    <title>كود QR نهائي</title>
+    <title>Code qr نهائي</title>
     <link rel="stylesheet" href="./style.css">
 
   </head>
@@ -14,37 +14,39 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>نظام إدارة المخيمات - مولد QR</title>
+    <title>تطبيق كود QR - نظام إدارة المخيمات</title>
     <link rel="stylesheet" href="style.css">
-    <!-- مكتبة QRCode مستقرة -->
     <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.1/build/qrcode.min.js"></script>
 </head>
 <body>
 
+<!-- شاشة تسجيل الدخول -->
 <div id="loginScreen" class="login-screen">
     <div class="login-card">
-        <h2>🔐 تسجيل الدخول</h2>
-        <input type="text" id="loginUsername" placeholder="اسم المستخدم (البريد الإلكتروني)">
+        <h2>📱 تطبيق كود QR</h2>
+        <h3>🏕️ نظام إدارة المخيمات</h3>
+        <input type="text" id="loginUsername" placeholder="اسم المستخدم">
         <input type="password" id="loginPassword" placeholder="كلمة المرور">
-        <button id="doLoginBtn">دخول</button>
+        <button id="doLoginBtn">🔐 تسجيل الدخول</button>
         <div id="loginError" class="error-msg"></div>
     </div>
 </div>
 
+<!-- التطبيق الرئيسي -->
 <div id="mainApp" class="main-app">
     <div class="top-bar">
         <div class="left-group">
             <button id="logoutBtn" class="logout-btn" title="تسجيل الخروج">🚪</button>
-            <button id="settingsMainBtn" class="settings-btn">⚙️</button>
+            <button id="settingsMainBtn" class="settings-btn" title="الإعدادات">⚙️</button>
         </div>
         <div class="camp-logo" id="campLogoArea">
             <img id="campLogoImg" src="" alt="شعار المخيم" style="display:none;">
             <span id="campNameHeader">المخيم</span>
         </div>
-        <button id="addCampInfoBtn" class="add-camp-btn">➕</button>
+        <button id="addCampInfoBtn" class="add-camp-btn" title="معلومات المخيم">➕</button>
     </div>
 
-    <h1 id="qrMainTitle" class="main-title">📱 نظام إدارة المخيمات</h1>
+    <h1 id="qrMainTitle" class="main-title">📱 تطبيق كود QR</h1>
     <div id="campDetailsDisplay" class="camp-info"></div>
 
     <!-- شريط البحث -->
@@ -53,15 +55,17 @@
         <div class="stats">عدد المصطافين: <span id="campersCount">0</span></div>
     </div>
 
+    <!-- جدول البيانات -->
     <div class="table-wrapper">
         <table class="data-table" id="dataTable">
             <thead>
-                <tr><th>اسم المصطاف</th><th>تاريخ الميلاد</th><th>المنشط المسؤول</th><th>هاتف المنشط</th><th>كود QR</th><th>تحميل QR</th><th>حذف</th></tr>
+                <tr><th>اسم المصطاف</th><th>تاريخ الميلاد</th><th>المنشط المسؤول</th><th>هاتف المنشط</th><th>كود QR</th><th>تحميل</th><th>حذف</th></tr>
             </thead>
             <tbody id="tableBody"></tbody>
         </table>
     </div>
     
+    <!-- الأزرار السفلية -->
     <div class="bottom-buttons">
         <button id="fillFormBtn" class="action-btn">📝 إضافة صف</button>
         <button id="generateQRBtn" class="action-btn">✨ إنشاء QR للجميع</button>
@@ -71,58 +75,71 @@
     </div>
 </div>
 
-<!-- النوافذ المنبثقة -->
+<!-- نافذة الإعدادات -->
 <div id="settingsModal" class="modal">
     <div class="modal-content">
         <h3>⚙️ الإعدادات</h3>
-        <label>تكبير خط العنوان: <input type="range" id="fontRange" min="20" max="70" step="2" value="40"></label>
-        <label>اختيار صورة خلفية: <input type="file" id="bgImageUpload" accept="image/*"></label>
+        <label>🔤 تكبير خط العنوان: 
+            <input type="range" id="fontRange" min="20" max="70" step="2" value="40">
+        </label>
+        <label>🖼️ صورة خلفية: 
+            <input type="file" id="bgImageUpload" accept="image/*">
+        </label>
         <button id="fullscreenToggle">🖥️ ملء الشاشة</button>
         <hr>
-        <button id="addSubAccountBtn" class="action-btn">➕ إضافة حساب فرعي</button>
-        <button id="listSubAccountsBtn" class="action-btn" style="background:gray;">📋 قائمة الحسابات الفرعية</button>
-        <button id="closeSettings">❌ إغلاق</button>
+        <button id="addSubAccountBtn" class="action-btn">➕ إضافة حساب فرعي جديد</button>
+        <button id="listSubAccountsBtn" class="action-btn" style="background:gray;">📋 عرض جميع الحسابات الفرعية</button>
+        <hr>
+        <button id="closeSettings" class="danger-btn">❌ إغلاق</button>
     </div>
 </div>
 
+<!-- نافذة إضافة حساب فرعي -->
 <div id="subAccountModal" class="modal">
     <div class="modal-content">
-        <h3>➕ إضافة حساب فرعي</h3>
-        <input type="text" id="subName" placeholder="الاسم واللقب (للتوثيق)" required>
+        <h3>➕ إضافة حساب فرعي جديد</h3>
+        <input type="text" id="subName" placeholder="الاسم الكامل" required>
+        <input type="text" id="subUsername" placeholder="اسم المستخدم" required>
+        <input type="password" id="subPassword" placeholder="كلمة المرور" required>
+        <input type="password" id="subConfirmPassword" placeholder="تأكيد كلمة المرور" required>
         <select id="subRole">
-            <option value="منشط">منشط</option>
             <option value="مدير">مدير</option>
-            <option value="مدير فرعي">مدير فرعي</option>
+            <option value="منشط">منشط</option>
+            <option value="مراقب">مراقب</option>
         </select>
-        <input type="email" id="subEmail" placeholder="البريد الإلكتروني (اسم المستخدم)" required>
-        <input type="password" id="subPass" placeholder="الرقم السري" required>
-        <input type="password" id="subConfirmPass" placeholder="تأكيد الرقم السري" required>
-        <small style="color: #666; display: block; margin: 5px 0;">
-            📌 سيتم استخدام البريد الإلكتروني كاسم مستخدم لتسجيل الدخول<br>
-            🔑 الرقم السري الذي تدخله هو نفسه المستخدم لتسجيل الدخول
-        </small>
+        <small>📌 سيتمكن هذا الحساب من الدخول وإدارة بياناته الخاصة</small>
         <button id="saveSubAccountBtn">💾 حفظ الحساب</button>
         <button id="closeSubModal">❌ إلغاء</button>
     </div>
 </div>
 
+<!-- نافذة عرض الحسابات الفرعية -->
+<div id="listAccountsModal" class="modal">
+    <div class="modal-content">
+        <h3>📋 قائمة الحسابات الفرعية</h3>
+        <div id="accountsList" style="max-height: 400px; overflow-y: auto;"></div>
+        <button id="closeListModal">❌ إغلاق</button>
+    </div>
+</div>
+
+<!-- نافذة معلومات المخيم -->
 <div id="campInfoModal" class="modal">
     <div class="modal-content">
         <h3>🏕️ معلومات المخيم</h3>
         <input type="text" id="campName" placeholder="اسم المخيم">
-        <input type="text" id="campManager" placeholder="مدير المخيم (الاسم واللقب)">
+        <input type="text" id="campManager" placeholder="مدير المخيم">
         <input type="tel" id="campPhone" placeholder="رقم هاتف المدير">
-        <label>شعار المخيم: <input type="file" id="campLogoUpload" accept="image/*"></label>
+        <label>🖼️ شعار المخيم: <input type="file" id="campLogoUpload" accept="image/*"></label>
         <button id="saveCampInfoBtn">💾 حفظ المعلومات</button>
         <button id="closeCampModal">❌ إلغاء</button>
     </div>
 </div>
 
-<!-- شريط تقدم العمليات -->
+<!-- شريط التقدم -->
 <div id="progressOverlay" class="progress-overlay" style="display:none;">
     <div class="progress-card">
         <div class="spinner"></div>
-        <p id="progressText">جاري إنشاء الأكواد...</p>
+        <p id="progressText">جاري المعالجة...</p>
         <div class="progress-bar">
             <div id="progressFill" class="progress-fill"></div>
         </div>
