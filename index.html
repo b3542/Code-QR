@@ -3,8 +3,8 @@
 
   <head>
     <meta charset="UTF-8">
-    <title>Code qr نهائي1</title>
-    <link rel="stylesheet" href="./style.css">
+    <title>Cod qr السحابي</title>
+    
 
   </head>
     
@@ -14,60 +14,117 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>تطبيق كود QR - نظام إدارة المخيمات</title>
-    <link rel="stylesheet" href="style.css">
+    <title>تطبيق كود QR - نظام إدارة المخيمات السحابي</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Cairo', 'Segoe UI', system-ui, sans-serif; }
+        body { background: #eef2f7; min-height: 100vh; }
+        .login-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(145deg, #0f2b3d 0%, #1b4a6e 100%); display: flex; justify-content: center; align-items: center; z-index: 1000; }
+        .login-card { background: rgba(255,255,255,0.95); backdrop-filter: blur(10px); padding: 45px 35px; border-radius: 65px; width: 90%; max-width: 440px; text-align: center; box-shadow: 0 35px 68px rgba(0,0,0,0.4); }
+        .login-card h2 { font-size: 2rem; background: linear-gradient(135deg, #0f2b3d, #2a5298); background-clip: text; -webkit-background-clip: text; color: transparent; }
+        .login-card h3 { margin-bottom: 30px; color: #2c3e66; }
+        .login-card input { width: 100%; padding: 16px 20px; margin: 12px 0; border: 2px solid #e2e8f0; border-radius: 60px; font-size: 1rem; outline: none; }
+        .login-card input:focus { border-color: #2a5298; }
+        .login-card button { width: 100%; padding: 16px; background: linear-gradient(95deg, #1e3c72, #2a5298); color: white; border: none; border-radius: 60px; font-size: 1.2rem; font-weight: bold; cursor: pointer; margin-top: 20px; }
+        .error-msg { color: #e53e3e; margin-top: 15px; }
+        .sync-status { font-size: 12px; margin-top: 15px; color: #15803d; background: #e8f5e9; padding: 8px; border-radius: 30px; }
+        .main-app { display: none; width: 100%; min-height: 100vh; background-size: cover; background-position: center; background-attachment: fixed; }
+        .top-bar { display: flex; justify-content: space-between; align-items: center; padding: 15px 25px; background: rgba(0,0,0,0.65); backdrop-filter: blur(12px); color: white; flex-wrap: wrap; }
+        .left-group { display: flex; gap: 12px; }
+        .settings-btn, .add-camp-btn, .logout-btn { background: white; border: none; font-size: 1.4rem; cursor: pointer; width: 46px; height: 46px; border-radius: 50%; transition: all 0.2s; }
+        .logout-btn { background: #ffebee; color: #c62828; }
+        .camp-logo { background: rgba(255,255,255,0.9); border-radius: 60px; padding: 5px 22px; display: flex; align-items: center; gap: 12px; color: #1e3c72; font-weight: bold; }
+        .camp-logo img { max-height: 45px; }
+        .main-title { text-align: center; font-size: 2.6rem; margin: 35px 0 20px; background: rgba(255,255,255,0.75); padding: 12px 30px; border-radius: 80px; width: fit-content; margin-left: auto; margin-right: auto; }
+        .camp-info { text-align: center; background: rgba(0,0,0,0.7); backdrop-filter: blur(4px); padding: 14px; margin: 0 20px 25px; border-radius: 60px; color: #f1f5f9; }
+        .search-bar { width: 96%; margin: 15px auto 20px; display: flex; gap: 18px; flex-wrap: wrap; justify-content: space-between; align-items: center; }
+        .search-container { flex: 2; min-width: 240px; position: relative; }
+        .search-icon { position: absolute; right: 18px; top: 50%; transform: translateY(-50%); color: #7f8c8d; font-size: 1.2rem; }
+        .search-container input { width: 100%; padding: 14px 50px 14px 50px; border-radius: 60px; border: 2px solid #cfdee9; font-size: 1rem; background: white; outline: none; }
+        .search-container input:focus { border-color: #2a5298; }
+        .clear-search { position: absolute; left: 18px; top: 50%; transform: translateY(-50%); background: none; border: none; font-size: 1.2rem; cursor: pointer; color: #888; }
+        .stats { background: rgba(30, 60, 114, 0.95); color: white; padding: 12px 24px; border-radius: 60px; font-weight: bold; }
+        .table-wrapper { width: 96%; margin: 20px auto; border-radius: 28px; box-shadow: 0 12px 28px rgba(0,0,0,0.15); background: white; max-height: 520px; overflow-y: auto; overflow-x: auto; }
+        .data-table { width: 100%; border-collapse: collapse; background: white; min-width: 1000px; }
+        .data-table thead th { position: sticky; top: 0; background: #1e2f4b; color: white; z-index: 10; padding: 16px 8px; }
+        .data-table th, .data-table td { border: 1px solid #ddd; padding: 12px 8px; text-align: center; vertical-align: middle; }
+        .data-table input { width: 100%; padding: 8px 6px; border: 1px solid #cbd5e1; border-radius: 40px; text-align: center; }
+        .qr-cell { min-width: 110px; }
+        .qr-container { display: flex; justify-content: center; align-items: center; min-width: 100px; min-height: 100px; }
+        .qr-container canvas { width: 95px !important; height: 95px !important; }
+        .qr-placeholder { width: 90px; height: 90px; background: #f1f5f9; display: flex; align-items: center; justify-content: center; font-size: 11px; border-radius: 18px; margin: 0 auto; }
+        .delete-row-btn, .download-qr-btn { background: #dc2626; color: white; border: none; padding: 6px 12px; border-radius: 40px; cursor: pointer; font-size: 0.75rem; }
+        .download-qr-btn { background: #16a34a; }
+        .bottom-buttons { display: flex; justify-content: center; gap: 14px; margin: 30px 0 35px; flex-wrap: wrap; }
+        .action-btn { background: #1e3c72; color: white; padding: 10px 22px; border: none; border-radius: 60px; font-weight: bold; cursor: pointer; transition: transform 0.2s; }
+        .action-btn:hover { transform: translateY(-2px); }
+        .danger-btn { background: #b91c1c; }
+        .green-btn { background: #15803d; }
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); justify-content: center; align-items: center; z-index: 2000; }
+        .modal-content { background: white; padding: 28px; border-radius: 48px; width: 90%; max-width: 500px; max-height: 80vh; overflow-y: auto; }
+        .modal-content input, .modal-content select { width: 100%; padding: 12px; margin: 8px 0; border-radius: 60px; border: 1px solid #ccc; }
+        .modal-content button { background: #1e3c72; color: white; border: none; padding: 10px; border-radius: 60px; margin-top: 12px; cursor: pointer; width: 100%; }
+        .modal-content ul { text-align: right; margin-right: 20px; }
+        .account-item { background: #f8fafc; padding: 15px; margin: 12px 0; border-radius: 28px; border-right: 5px solid #2a5298; }
+        .progress-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.92); display: flex; justify-content: center; align-items: center; z-index: 3000; }
+        .progress-card { background: white; padding: 35px; border-radius: 48px; text-align: center; }
+        .spinner { border: 5px solid #e2e8f0; border-top: 5px solid #2a5298; border-radius: 50%; width: 55px; height: 55px; animation: spin 0.9s linear infinite; margin: 0 auto 20px; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        .progress-bar { width: 100%; height: 18px; background: #e2e8f0; border-radius: 20px; overflow: hidden; margin: 15px 0; }
+        .progress-fill { background: #2a5298; width: 0%; height: 100%; }
+        #saveIndicator { position: fixed; bottom: 20px; right: 20px; background: #15803d; color: white; padding: 8px 18px; border-radius: 40px; opacity: 0; transition: opacity 0.3s; z-index: 9999; }
+        .sync-badge { position: fixed; bottom: 20px; left: 20px; background: rgba(0,0,0,0.75); color: #4ade80; padding: 6px 14px; border-radius: 30px; font-size: 11px; font-family: monospace; z-index: 9998; backdrop-filter: blur(5px); }
+        @media (max-width: 700px) { .data-table th, .data-table td { font-size: 12px; } .action-btn { padding: 6px 12px; font-size: 0.75rem; } .main-title { font-size: 1.7rem; } }
+    </style>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.1/build/qrcode.min.js"></script>
-    <!-- مكتبة لقراءة ملفات Excel -->
-    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+    <script src="https://cdn.sheetjs.com/xlsx-0.20.2/package/dist/xlsx.full.min.js"></script>
 </head>
 <body>
 
-<!-- شاشة تسجيل الدخول -->
 <div id="loginScreen" class="login-screen">
     <div class="login-card">
-        <h2>📱 تطبيق كود QR</h2>
-        <h3>🏕️ نظام إدارة المخيمات</h3>
+        <h2>☁️ كود QR سحابي</h2>
+        <h3>🏕️ نظام إدارة المخيمات المتزامن</h3>
         <input type="text" id="loginUsername" placeholder="اسم المستخدم">
         <input type="password" id="loginPassword" placeholder="كلمة المرور">
-        <button id="doLoginBtn">🔐 تسجيل الدخول</button>
+        <button id="doLoginBtn">🔐 دخول</button>
         <div id="loginError" class="error-msg"></div>
+        <div class="sync-status">✅ مزامنة سحابية | بياناتك محفوظة على السحابة</div>
     </div>
 </div>
 
-<!-- التطبيق الرئيسي -->
 <div id="mainApp" class="main-app">
     <div class="top-bar">
         <div class="left-group">
-            <button id="logoutBtn" class="logout-btn" title="تسجيل الخروج">🚪</button>
-            <button id="settingsMainBtn" class="settings-btn" title="الإعدادات">⚙️</button>
+            <button id="logoutBtn" class="logout-btn" title="خروج">🚪</button>
+            <button id="settingsMainBtn" class="settings-btn" title="إعدادات">⚙️</button>
         </div>
         <div class="camp-logo" id="campLogoArea">
-            <img id="campLogoImg" src="" alt="شعار المخيم" style="display:none;">
+            <img id="campLogoImg" src="" alt="الشعار" style="display:none;">
             <span id="campNameHeader">المخيم</span>
         </div>
         <button id="addCampInfoBtn" class="add-camp-btn" title="معلومات المخيم">➕</button>
     </div>
-
-    <h1 id="qrMainTitle" class="main-title">📱 تطبيق كود QR</h1>
+    <h1 id="qrMainTitle" class="main-title">📱 تطبيق كود QR السحابي</h1>
     <div id="campDetailsDisplay" class="camp-info"></div>
 
-    <!-- شريط البحث -->
     <div class="search-bar">
-        <input type="text" id="searchInput" placeholder="🔍 بحث باسم المصطاف...">
-        <div class="stats">عدد المصطافين: <span id="campersCount">0</span></div>
+        <div class="search-container">
+            <span class="search-icon">🔍</span>
+            <input type="text" id="searchInput" placeholder="بحث باسم المصطاف أو المنشط...">
+            <button id="clearSearchBtn" class="clear-search" style="display:none;">✖</button>
+        </div>
+        <div class="stats">📊 <span id="campersCount">0</span> مصطاف <span id="searchInfo" style="display:none; color:#ffd966;"> | 🔍 <span id="resultCount">0</span> نتيجة</span></div>
     </div>
 
-    <!-- جدول البيانات -->
     <div class="table-wrapper">
-        <table class="data-table" id="dataTable">
-            <thead>
-                <tr><th>اسم المصطاف</th><th>تاريخ الميلاد</th><th>المنشط المسؤول</th><th>هاتف المنشط</th><th>كود QR</th><th>تحميل</th><th>حذف</th></tr>
-            </thead>
+        <table class="data-table">
+            <thead><tr><th style="width:60px">#</th><th>اسم المصطاف</th><th style="width:120px">تاريخ الميلاد</th><th>المنشط المسؤول</th><th style="width:130px">هاتف المنشط</th><th style="width:120px">QR</th><th style="width:80px">تحميل</th><th style="width:70px">حذف</th></tr></thead>
             <tbody id="tableBody"></tbody>
         </table>
     </div>
     
-    <!-- الأزرار السفلية -->
     <div class="bottom-buttons">
         <button id="fillFormBtn" class="action-btn">📝 إضافة صف</button>
         <button id="generateQRBtn" class="action-btn">✨ إنشاء QR للجميع</button>
@@ -76,102 +133,394 @@
         <button id="importExcelBtn" class="action-btn" style="background:#8B5CF6;">📂 استيراد Excel</button>
         <button id="downloadAllQrBtn" class="action-btn green-btn">💾 تحميل كل الأكواد</button>
     </div>
+    <div class="sync-badge" id="syncBadge">☁️ متزامن</div>
 </div>
 
-<!-- نافذة استيراد Excel -->
+<!-- المودالات -->
 <div id="importExcelModal" class="modal">
     <div class="modal-content">
         <h3>📂 استيراد بيانات من Excel</h3>
-        <p style="margin: 10px 0; color: #666;">⚠️ يجب أن يحتوي ملف Excel على الأعمدة التالية بالترتيب:</p>
+        <p style="margin: 10px 0; color: #666;">⚠️ يجب أن يحتوي ملف Excel على الأعمدة التالية:</p>
         <ul style="margin: 10px 20px; color: #555;">
-            <li>العمود A: اسم المصطاف</li>
-            <li>العمود B: تاريخ الميلاد</li>
-            <li>العمود C: المنشط المسؤول</li>
-            <li>العمود D: هاتف المنشط</li>
+            <li>العمود 1 أو 2: اسم المصطاف</li>
+            <li>العمود 2 أو 3: تاريخ الميلاد</li>
+            <li>العمود 3 أو 4: المنشط المسؤول</li>
+            <li>العمود 4 أو 5: هاتف المنشط</li>
         </ul>
-        <input type="file" id="excelFileInput" accept=".xlsx, .xls, .csv" style="margin: 15px 0;">
-        <button id="confirmImportBtn" class="action-btn" style="background:#8B5CF6;">✅ استيراد البيانات</button>
+        <input type="file" id="excelFileInput" accept=".xlsx, .xls, .csv">
+        <button id="confirmImportBtn" style="background:#8B5CF6;">✅ استيراد</button>
         <button id="closeImportModal" class="danger-btn">❌ إلغاء</button>
     </div>
 </div>
+<div id="settingsModal" class="modal"><div class="modal-content"><h3>⚙️ إعدادات</h3><label>🔤 حجم الخط: <input type="range" id="fontRange" min="20" max="70" value="40"></label><label>🖼️ خلفية: <input type="file" id="bgImageUpload" accept="image/*"></label><button id="fullscreenToggle">🖥️ ملء الشاشة</button><hr><button id="addSubAccountBtn">➕ حساب فرعي</button><button id="listSubAccountsBtn">📋 جميع الحسابات</button><hr><button id="closeSettings">إغلاق</button></div></div>
+<div id="subAccountModal" class="modal"><div class="modal-content"><h3>حساب فرعي</h3><input type="text" id="subName" placeholder="الاسم الكامل"><input type="text" id="subUsername" placeholder="اسم المستخدم"><input type="password" id="subPassword" placeholder="كلمة المرور"><input type="password" id="subConfirmPassword" placeholder="تأكيد"><select id="subRole"><option>مدير</option><option>منشط</option><option>مراقب</option></select><button id="saveSubAccountBtn">حفظ</button><button id="closeSubModal">إلغاء</button></div></div>
+<div id="listAccountsModal" class="modal"><div class="modal-content"><h3>📋 الحسابات</h3><div id="accountsList"></div><button id="closeListModal">إغلاق</button></div></div>
+<div id="campInfoModal" class="modal"><div class="modal-content"><h3>معلومات المخيم</h3><input type="text" id="campName" placeholder="اسم المخيم"><input type="text" id="campManager" placeholder="المدير"><input type="tel" id="campPhone" placeholder="الهاتف"><label>شعار: <input type="file" id="campLogoUpload" accept="image/*"></label><button id="saveCampInfoBtn">حفظ</button><button id="closeCampModal">إلغاء</button></div></div>
+<div id="progressOverlay" class="progress-overlay" style="display:none;"><div class="progress-card"><div class="spinner"></div><p id="progressText">جاري...</p><div class="progress-bar"><div id="progressFill" class="progress-fill"></div></div><span id="progressPercent">0%</span></div></div>
 
-<!-- نافذة الإعدادات -->
-<div id="settingsModal" class="modal">
-    <div class="modal-content">
-        <h3>⚙️ الإعدادات</h3>
-        <label>🔤 تكبير خط العنوان: 
-            <input type="range" id="fontRange" min="20" max="70" step="2" value="40">
-        </label>
-        <label>🖼️ صورة خلفية: 
-            <input type="file" id="bgImageUpload" accept="image/*">
-        </label>
-        <button id="fullscreenToggle">🖥️ ملء الشاشة</button>
-        <hr>
-        <button id="addSubAccountBtn" class="action-btn">➕ إضافة حساب فرعي جديد</button>
-        <button id="listSubAccountsBtn" class="action-btn" style="background:gray;">📋 عرض جميع الحسابات الفرعية</button>
-        <hr>
-        <button id="closeSettings" class="danger-btn">❌ إغلاق</button>
-    </div>
-</div>
-
-<!-- نافذة إضافة حساب فرعي -->
-<div id="subAccountModal" class="modal">
-    <div class="modal-content">
-        <h3>➕ إضافة حساب فرعي جديد</h3>
-        <input type="text" id="subName" placeholder="الاسم الكامل" required>
-        <input type="text" id="subUsername" placeholder="اسم المستخدم" required>
-        <input type="password" id="subPassword" placeholder="كلمة المرور" required>
-        <input type="password" id="subConfirmPassword" placeholder="تأكيد كلمة المرور" required>
-        <select id="subRole">
-            <option value="مدير">مدير</option>
-            <option value="منشط">منشط</option>
-            <option value="مراقب">مراقب</option>
-        </select>
-        <small>📌 سيتمكن هذا الحساب من الدخول وإدارة بياناته الخاصة</small>
-        <button id="saveSubAccountBtn">💾 حفظ الحساب</button>
-        <button id="closeSubModal">❌ إلغاء</button>
-    </div>
-</div>
-
-<!-- نافذة عرض الحسابات الفرعية -->
-<div id="listAccountsModal" class="modal">
-    <div class="modal-content">
-        <h3>📋 قائمة الحسابات الفرعية</h3>
-        <div id="accountsList" style="max-height: 400px; overflow-y: auto;"></div>
-        <button id="closeListModal">❌ إغلاق</button>
-    </div>
-</div>
-
-<!-- نافذة معلومات المخيم -->
-<div id="campInfoModal" class="modal">
-    <div class="modal-content">
-        <h3>🏕️ معلومات المخيم</h3>
-        <input type="text" id="campName" placeholder="اسم المخيم">
-        <input type="text" id="campManager" placeholder="مدير المخيم">
-        <input type="tel" id="campPhone" placeholder="رقم هاتف المدير">
-        <label>🖼️ شعار المخيم: <input type="file" id="campLogoUpload" accept="image/*"></label>
-        <button id="saveCampInfoBtn">💾 حفظ المعلومات</button>
-        <button id="closeCampModal">❌ إلغاء</button>
-    </div>
-</div>
-
-<!-- شريط التقدم -->
-<div id="progressOverlay" class="progress-overlay" style="display:none;">
-    <div class="progress-card">
-        <div class="spinner"></div>
-        <p id="progressText">جاري المعالجة...</p>
-        <div class="progress-bar">
-            <div id="progressFill" class="progress-fill"></div>
-        </div>
-        <span id="progressPercent">0%</span>
-    </div>
-</div>
-
-<script src="script.js"></script>
+<script>
+    // 🔴 إعدادات Firebase الخاصة بمشروعك
+    const firebaseConfig = {
+        apiKey: "AIzaSyD_EfCS-8sqtPG2lbup_8VIVIFmP1tECOE",
+        authDomain: "gestion-des-polle.firebaseapp.com",
+        projectId: "gestion-des-polle",
+        storageBucket: "gestion-des-polle.firebasestorage.app",
+        messagingSenderId: "521664511888",
+        appId: "1:521664511888:web:d57c0bd31d986ae6ce7d15",
+        measurementId: "G-4V9ZW937SX"
+    };
+    
+    let db = null;
+    let firestoreAvailable = false;
+    
+    try {
+        if (typeof firebase !== 'undefined' && !firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+            db = firebase.firestore();
+            firestoreAvailable = true;
+            console.log("✅ Firebase connected");
+        } else if (typeof firebase !== 'undefined' && firebase.apps.length) {
+            db = firebase.firestore();
+            firestoreAvailable = true;
+        }
+    } catch(e) { console.warn("⚠️ Firebase not available", e); }
+    
+    const MAIN_ACCOUNT = { username: "bilalayeb1996", password: "bilalayeb1996", fullName: "بلال عايب", role: "مدير عام", isMain: true };
+    
+    function getSubAccounts() { return JSON.parse(localStorage.getItem("subAccounts") || "[]"); }
+    function saveSubAccounts(sub) { localStorage.setItem("subAccounts", JSON.stringify(sub)); if(firestoreAvailable && db) db.collection("system").doc("subAccounts").set({ accounts: sub }).catch(console.warn); }
+    
+    async function syncUserDataToCloud(username, campers, campInfo) {
+        if(!firestoreAvailable || !db || !username) return false;
+        try {
+            await db.collection("users").doc(username).set({
+                campers: campers || [],
+                campInfo: campInfo || {},
+                lastUpdated: firebase.firestore.FieldValue.serverTimestamp()
+            }, { merge: true });
+            updateSyncBadge("☁️ تم الحفظ");
+            return true;
+        } catch(e) { updateSyncBadge("⚠️ غير متصل"); return false; }
+    }
+    
+    async function loadUserDataFromCloud(username) {
+        if(!firestoreAvailable || !db || !username) return null;
+        try {
+            const doc = await db.collection("users").doc(username).get();
+            if(doc.exists) { updateSyncBadge("☁️ متزامن"); return doc.data(); }
+        } catch(e) { updateSyncBadge("⚠️ وضع غير متصل"); }
+        return null;
+    }
+    
+    function saveUserData(username, campers, campInfo) {
+        if(!username) return;
+        localStorage.setItem(`userData_${username}`, JSON.stringify({ campers: campers || [], campInfo: campInfo || {}, lastUpdated: new Date().toISOString() }));
+        showSaveIndicator();
+        syncUserDataToCloud(username, campers, campInfo);
+    }
+    
+    async function loadUserData(username) {
+        if(!username) return { campers: [], campInfo: {} };
+        const cloudData = await loadUserDataFromCloud(username);
+        if(cloudData) return cloudData;
+        const localData = localStorage.getItem(`userData_${username}`);
+        return localData ? JSON.parse(localData) : { campers: [], campInfo: { name: "مخيم الأمل", manager: "غير محدد", phone: "", logo: "" } };
+    }
+    
+    function updateSyncBadge(status) {
+        const b = document.getElementById("syncBadge");
+        if(b) b.innerText = status;
+        setTimeout(() => { if(b && document.getElementById("mainApp").style.display === "block") b.innerText = "☁️ متزامن"; }, 2000);
+    }
+    
+    async function loadSubAccountsFromCloud() {
+        if(!firestoreAvailable || !db) return;
+        try {
+            const doc = await db.collection("system").doc("subAccounts").get();
+            if(doc.exists) {
+                const data = doc.data();
+                if(data.accounts && data.accounts.length) localStorage.setItem("subAccounts", JSON.stringify(data.accounts));
+            }
+        } catch(e) { console.warn(e); }
+    }
+    
+    let currentUser = null, campersData = [], campData = { name: " ", manager: " ", phone: "", logo: "" }, fontSize = localStorage.getItem("titleFontSize") || 40, backgroundImage = localStorage.getItem("bgImage") || "", saveTimeout = null;
+    const loginScreenDiv = document.getElementById("loginScreen"), mainAppDiv = document.getElementById("mainApp"), tableBody = document.getElementById("tableBody");
+    
+    function showProgress(show, text, percent) { const ov = document.getElementById("progressOverlay"); if(show) { ov.style.display = "flex"; document.getElementById("progressText").innerText = text; document.getElementById("progressFill").style.width = percent + "%"; document.getElementById("progressPercent").innerText = percent + "%"; } else ov.style.display = "none"; }
+    function showSaveIndicator() { let ind = document.getElementById("saveIndicator"); if(!ind) { ind = document.createElement("div"); ind.id = "saveIndicator"; ind.innerHTML = "💾 تم الحفظ"; document.body.appendChild(ind); } ind.style.opacity = "1"; setTimeout(() => ind.style.opacity = "0", 1500); }
+    function sanitizeFileName(n) { return (n?.trim() || "مصطاف").replace(/[\\/:*?"<>|]/g, '').substring(0, 50); }
+    function escapeHtml(str) { if(!str) return ""; return str.replace(/[&<>]/g, m => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;' }[m])); }
+    function convertToEnglishNumbers(str) { if(!str) return str; const map = {'٠':'0','١':'1','٢':'2','٣':'3','٤':'4','٥':'5','٦':'6','٧':'7','٨':'8','٩':'9'}; return str.toString().replace(/[٠-٩]/g, d => map[d]); }
+    function autoSave() { if(currentUser) saveUserData(currentUser.username, campersData, campData); }
+    function debounceAutoSave() { if(saveTimeout) clearTimeout(saveTimeout); saveTimeout = setTimeout(autoSave, 500); }
+    
+    function filterTable() {
+        const inp = document.getElementById("searchInput"), term = inp?.value.trim().toLowerCase() || "";
+        const btn = document.getElementById("clearSearchBtn"); if(btn) btn.style.display = term ? "block" : "none";
+        const rows = document.querySelectorAll("#tableBody tr");
+        let visible = 0;
+        rows.forEach(row => {
+            const name = row.querySelector(".name-input")?.value.trim().toLowerCase() || "";
+            const sup = row.querySelector(".supervisor-input")?.value.trim().toLowerCase() || "";
+            const match = term === "" || name.includes(term) || sup.includes(term);
+            row.style.display = match ? "" : "none";
+            if(match) visible++;
+            row.style.backgroundColor = (match && term) ? "#eef4ff" : "";
+        });
+        document.getElementById("campersCount").innerText = term === "" ? campersData.length : visible;
+        const info = document.getElementById("searchInfo");
+        if(info) info.style.display = term ? "inline" : "none";
+        if(term) document.getElementById("resultCount").innerText = visible;
+    }
+    
+    async function generateSingleQR(idx, camper) {
+        return new Promise(resolve => {
+            const txt = `🏕️ المخيم: ${campData.name}\n👤 المدير: ${campData.manager}\n📞 هاتف: ${campData.phone}\n\n🧑 المصطاف: ${camper.name}\n📅 تاريخ الميلاد: ${camper.dob}\n👨‍🏫 المنشط: ${camper.supervisor}\n📞 هاتف المنشط: ${camper.supervisorPhone}`;
+            const c = document.getElementById(`qrContainer_${idx}`); if(!c) { resolve(false); return; }
+            c.innerHTML = ""; c.className = "qr-container";
+            const canvas = document.createElement("canvas"); canvas.width = 500; canvas.height = 500; canvas.style.width = "100px"; canvas.style.height = "100px";
+            c.appendChild(canvas);
+            QRCode.toCanvas(canvas, txt, { width: 500, margin: 2, errorCorrectionLevel: 'H' }, err => { if(err) { c.innerHTML = '<div class="qr-placeholder">❌ خطأ</div>'; resolve(false); } else resolve(true); });
+        });
+    }
+    
+    function downloadQRImageFromCanvas(containerId, fileName) {
+        const c = document.getElementById(containerId); if(!c) { alert("خطأ"); return false; }
+        const orig = c.querySelector('canvas'); if(!orig) { alert("⚠️ أنشئ QR أولاً"); return false; }
+        const high = document.createElement('canvas'); high.width = 2000; high.height = 2000; const ctx = high.getContext('2d'); ctx.imageSmoothingEnabled = false; ctx.drawImage(orig, 0, 0, 2000, 2000);
+        const a = document.createElement('a'); a.download = `${fileName}_QR.png`; a.href = high.toDataURL('image/png'); a.click(); return true;
+    }
+    
+    function renderTable() {
+        if(!tableBody) return; tableBody.innerHTML = "";
+        if(campersData.length === 0) { tableBody.innerHTML = `<tr><td colspan='8' style='text-align:center'>⚠️ لا توجد بيانات، أضف صفاً جديداً</td></tr>`; updateStats(); filterTable(); return; }
+        campersData.forEach((c, idx) => {
+            const row = document.createElement("tr");
+            row.innerHTML = `<td style="font-weight:bold;color:#1e3c72;">${idx+1}</td>
+                <td><input type="text" class="name-input" value="${escapeHtml(c.name)}" placeholder="الاسم الكامل"></td>
+                <td><input type="text" class="dob-input" value="${convertToEnglishNumbers(c.dob || '')}" placeholder="YYYY-MM-DD" dir="ltr"></td>
+                <td><input type="text" class="supervisor-input" value="${escapeHtml(c.supervisor)}" placeholder="اسم المنشط"></td>
+                <td><input type="tel" class="supervisor-phone" value="${escapeHtml(c.supervisorPhone)}" placeholder="رقم الهاتف"></td>
+                <td class="qr-cell"><div id="qrContainer_${idx}" class="qr-container qr-placeholder">🔄 اضغط إنشاء</div></td>
+                <td><button class="download-qr-btn" data-idx="${idx}">📸 تحميل</button></td>
+                <td><button class="delete-row-btn" data-idx="${idx}">🗑️ حذف</button></td>`;
+            const nameInp = row.querySelector(".name-input"), dobInp = row.querySelector(".dob-input"), supInp = row.querySelector(".supervisor-input"), phoneInp = row.querySelector(".supervisor-phone");
+            const update = () => { let nd = convertToEnglishNumbers(dobInp.value); if(dobInp.value !== nd) dobInp.value = nd; campersData[idx] = { name: nameInp.value, dob: nd, supervisor: supInp.value, supervisorPhone: phoneInp.value }; debounceAutoSave(); filterTable(); };
+            nameInp.addEventListener("input", update); dobInp.addEventListener("input", update); supInp.addEventListener("input", update); phoneInp.addEventListener("input", update);
+            row.querySelector(".delete-row-btn").onclick = () => { if(confirm("حذف هذا الشخص؟")) { campersData.splice(idx,1); renderTable(); autoSave(); } };
+            row.querySelector(".download-qr-btn").onclick = async () => { if(!campersData[idx].name?.trim()) { alert("يرجى إدخال اسم المصطاف أولاً"); return; } const d = document.getElementById(`qrContainer_${idx}`); if(!d?.querySelector('canvas')) await generateSingleQR(idx, campersData[idx]); downloadQRImageFromCanvas(`qrContainer_${idx}`, sanitizeFileName(campersData[idx].name)); };
+            tableBody.appendChild(row);
+        });
+        updateStats(); filterTable();
+    }
+    
+    function updateStats() { document.getElementById("campersCount").innerText = campersData.length; }
+    function addEmptyRow() { campersData.push({ name: "", dob: "", supervisor: "", supervisorPhone: "" }); renderTable(); autoSave(); }
+    function deleteAllRows() { if(confirm("⚠️ حذف جميع البيانات؟")) { campersData = []; renderTable(); autoSave(); } }
+    async function generateAllQRs() { if(!campersData.length) return alert("لا توجد بيانات"); showProgress(true,"إنشاء QR ...",0); for(let i=0;i<campersData.length;i++) { showProgress(true,`${i+1}/${campersData.length}`, Math.round((i/campersData.length)*100)); await generateSingleQR(i, campersData[i]); await new Promise(r=>setTimeout(r,30)); } showProgress(false); alert("✅ تم إنشاء جميع QR"); }
+    async function downloadAllQRCodes() { if(!campersData.length) return alert("لا توجد بيانات"); showProgress(true,"تجهيز...",0); for(let i=0;i<campersData.length;i++) { const d = document.getElementById(`qrContainer_${i}`); if(!d?.querySelector('canvas')) await generateSingleQR(i, campersData[i]); } for(let i=0;i<campersData.length;i++) { downloadQRImageFromCanvas(`qrContainer_${i}`, sanitizeFileName(campersData[i].name) || `مصطاف_${i+1}`); await new Promise(r=>setTimeout(r,180)); } showProgress(false); alert("✅ تم تحميل جميع الأكواد"); }
+    
+    // ========== دوال Excel المصححة ==========
+    function exportToExcel() {
+        if(campersData.length === 0) {
+            alert("⚠️ لا توجد بيانات للتصدير");
+            return;
+        }
+        
+        // إنشاء البيانات بالشكل المطلوب مع الترقيم
+        const exportData = [
+            ["#", "اسم المصطاف", "تاريخ الميلاد", "المنشط المسؤول", "هاتف المنشط"]
+        ];
+        
+        campersData.forEach((camper, index) => {
+            exportData.push([
+                index + 1,
+                camper.name || "",
+                camper.dob || "",
+                camper.supervisor || "",
+                camper.supervisorPhone || ""
+            ]);
+        });
+        
+        // إنشاء ورقة عمل
+        const ws = XLSX.utils.aoa_to_sheet(exportData);
+        
+        // ضبط عرض الأعمدة
+        ws['!cols'] = [{wch:8}, {wch:25}, {wch:15}, {wch:20}, {wch:20}];
+        
+        // إنشاء ملف Excel
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, "بيانات المخيم");
+        
+        // تحميل الملف
+        const fileName = `بيانات_${campData.name || "المخيم"}_${new Date().toLocaleDateString('ar')}.xlsx`;
+        XLSX.writeFile(wb, fileName);
+        
+        alert("✅ تم تصدير البيانات بنجاح!");
+    }
+    
+    function importExcel(file) {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const data = new Uint8Array(e.target.result);
+                    const workbook = XLSX.read(data, { type: 'array' });
+                    const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+                    const rows = XLSX.utils.sheet_to_json(firstSheet, { header: 1, defval: "" });
+                    
+                    if (!rows || rows.length < 2) {
+                        reject(new Error("الملف فارغ أو لا يحتوي على بيانات"));
+                        return;
+                    }
+                    
+                    const importedCampers = [];
+                    
+                    // تخطي الصف الأول (رأس الجدول)
+                    for (let i = 1; i < rows.length; i++) {
+                        const row = rows[i];
+                        if (!row || row.length < 2) continue;
+                        
+                        // محاولة تحديد الأعمدة المناسبة
+                        let nameIndex = 1;      // العمود B (اسم المصطاف)
+                        let dobIndex = 2;        // العمود C (تاريخ الميلاد)
+                        let supervisorIndex = 3; // العمود D (المنشط)
+                        let phoneIndex = 4;      // العمود E (الهاتف)
+                        
+                        // إذا كان الصف يحتوي على ترقيم في العمود الأول
+                        if (row.length >= 5 && !isNaN(parseFloat(row[0])) && isFinite(row[0])) {
+                            nameIndex = 1;
+                            dobIndex = 2;
+                            supervisorIndex = 3;
+                            phoneIndex = 4;
+                        }
+                        // إذا كان الصف لا يحتوي على ترقيم
+                        else if (row.length >= 4) {
+                            nameIndex = 0;
+                            dobIndex = 1;
+                            supervisorIndex = 2;
+                            phoneIndex = 3;
+                        }
+                        
+                        const name = row[nameIndex]?.toString().trim() || "";
+                        if (name && name !== "") {
+                            let dobValue = row[dobIndex] ? row[dobIndex].toString() : "";
+                            dobValue = convertToEnglishNumbers(dobValue);
+                            
+                            importedCampers.push({
+                                name: name,
+                                dob: dobValue,
+                                supervisor: row[supervisorIndex]?.toString().trim() || "",
+                                supervisorPhone: row[phoneIndex]?.toString().trim() || ""
+                            });
+                        }
+                    }
+                    
+                    if (importedCampers.length === 0) {
+                        reject(new Error("لم يتم العثور على بيانات صالحة في الملف"));
+                    } else {
+                        resolve(importedCampers);
+                    }
+                } catch (err) {
+                    reject(new Error("خطأ في قراءة الملف: " + err.message));
+                }
+            };
+            reader.onerror = () => reject(new Error("فشل في قراءة الملف"));
+            reader.readAsArrayBuffer(file);
+        });
+    }
+    
+    function loadCampDataToUI() { document.getElementById("campNameHeader").innerText = campData.name || "المخيم"; const logo = document.getElementById("campLogoImg"); if(campData.logo) { logo.src = campData.logo; logo.style.display = "inline-block"; } else logo.style.display = "none"; document.getElementById("campDetailsDisplay").innerHTML = `🏕️ ${campData.name || "المخيم"} | مدير: ${campData.manager || "غير محدد"} | 📞 ${campData.phone || "---"}`; }
+    function applySettings() { document.getElementById("qrMainTitle").style.fontSize = fontSize+"px"; if(backgroundImage) mainAppDiv.style.backgroundImage = `url('${backgroundImage}')`; document.getElementById("fontRange").value = fontSize; }
+    function logout() { if(currentUser) autoSave(); currentUser=null; loginScreenDiv.style.display="flex"; mainAppDiv.style.display="none"; document.getElementById("loginUsername").value=""; document.getElementById("loginPassword").value=""; document.getElementById("loginError").innerText=""; }
+    function addSubAccount(name,user,pass,role){ let subs=getSubAccounts(); if(subs.find(a=>a.username===user)) { alert("اسم المستخدم موجود"); return false; } subs.push({username:user,password:pass,fullName:name,role,isMain:false}); saveSubAccounts(subs); alert(`✅ تم الإضافة`); return true; }
+    function deleteSubAccount(username){ let subs=getSubAccounts(); let idx=subs.findIndex(a=>a.username===username); if(idx!==-1){ subs.splice(idx,1); saveSubAccounts(subs); localStorage.removeItem(`userData_${username}`); if(firestoreAvailable && db) db.collection("users").doc(username).delete().catch(console.warn); alert("تم الحذف"); return true; } return false; }
+    function showAllSubAccounts(){ const subs=getSubAccounts(); const container=document.getElementById("accountsList"); if(!subs.length){ container.innerHTML="<p style='text-align:center'>📭 لا توجد حسابات</p>"; } else { container.innerHTML=""; subs.forEach(acc=>{ const div=document.createElement("div"); div.className="account-item"; div.innerHTML=`<h4>👤 ${acc.fullName}</h4><p>📧 ${acc.username}</p><p>🔑 ${acc.password}</p><p>🎭 ${acc.role}</p><button class="delete-account-btn" data-user="${acc.username}">🗑️ حذف</button>`; div.querySelector(".delete-account-btn").onclick=()=>{ if(confirm(`حذف ${acc.fullName}?`)){ deleteSubAccount(acc.username); showAllSubAccounts(); } }; container.appendChild(div); }); } document.getElementById("listAccountsModal").style.display="flex"; }
+    function login(user,pass){ if(user===MAIN_ACCOUNT.username && pass===MAIN_ACCOUNT.password){ currentUser=MAIN_ACCOUNT; return true; } const sub=getSubAccounts().find(a=>a.username===user && a.password===pass); if(sub){ currentUser=sub; return true; } return false; }
+    
+    // ربط الأحداث
+    document.getElementById("doLoginBtn").onclick = async () => {
+        const u=document.getElementById("loginUsername").value.trim(), p=document.getElementById("loginPassword").value;
+        if(!u||!p){ document.getElementById("loginError").innerText="❌ أدخل البيانات"; return; }
+        if(login(u,p)){
+            showProgress(true, "جاري تحميل البيانات من السحابة...", 30);
+            const data = await loadUserData(currentUser.username);
+            campersData = data.campers || [];
+            campData = data.campInfo || { name: "مخيم الأمل", manager: "غير محدد", phone: "", logo: "" };
+            loginScreenDiv.style.display="none";
+            mainAppDiv.style.display="block";
+            loadCampDataToUI();
+            renderTable();
+            applySettings();
+            document.getElementById("searchInput").addEventListener("input", filterTable);
+            document.getElementById("clearSearchBtn").onclick = () => { const inp=document.getElementById("searchInput"); if(inp){ inp.value=""; filterTable(); } };
+            showProgress(false);
+            setTimeout(()=>alert(`👋 مرحباً ${currentUser.fullName}\n✅ بياناتك متزامنة مع السحابة`),100);
+        } else { document.getElementById("loginError").innerText="❌ خطأ في البيانات"; }
+    };
+    
+    document.getElementById("fillFormBtn").onclick = addEmptyRow;
+    document.getElementById("deleteAllRowsBtn").onclick = deleteAllRows;
+    document.getElementById("generateQRBtn").onclick = generateAllQRs;
+    document.getElementById("downloadAllQrBtn").onclick = downloadAllQRCodes;
+    document.getElementById("exportExcelBtn").onclick = exportToExcel;
+    document.getElementById("logoutBtn").onclick = logout;
+    
+    // استيراد Excel
+    document.getElementById("importExcelBtn").onclick = () => document.getElementById("importExcelModal").style.display = "flex";
+    document.getElementById("confirmImportBtn").onclick = async () => {
+        const file = document.getElementById("excelFileInput").files[0];
+        if (!file) {
+            alert("⚠️ الرجاء اختيار ملف Excel أولاً");
+            return;
+        }
+        
+        showProgress(true, "جاري استيراد البيانات...", 0);
+        try {
+            const importedCampers = await importExcel(file);
+            if (importedCampers.length > 0) {
+                campersData.push(...importedCampers);
+                renderTable();
+                autoSave();
+                alert(`✅ تم استيراد ${importedCampers.length} سجل بنجاح!`);
+            } else {
+                alert("⚠️ لم يتم العثور على بيانات في الملف");
+            }
+        } catch (error) {
+            alert("❌ خطأ في الاستيراد: " + error.message);
+        }
+        showProgress(false);
+        document.getElementById("importExcelModal").style.display = "none";
+        document.getElementById("excelFileInput").value = "";
+    };
+    document.getElementById("closeImportModal").onclick = () => {
+        document.getElementById("importExcelModal").style.display = "none";
+        document.getElementById("excelFileInput").value = "";
+    };
+    
+    document.getElementById("settingsMainBtn").onclick = () => document.getElementById("settingsModal").style.display = "flex";
+    document.getElementById("closeSettings").onclick = () => document.getElementById("settingsModal").style.display = "none";
+    document.getElementById("fontRange").oninput = e=>{ fontSize=e.target.value; localStorage.setItem("titleFontSize",fontSize); document.getElementById("qrMainTitle").style.fontSize=fontSize+"px"; };
+    document.getElementById("bgImageUpload").onchange = e=>{ const f=e.target.files[0]; if(f){ const reader=new FileReader(); reader.onload=ev=>{ backgroundImage=ev.target.result; localStorage.setItem("bgImage",backgroundImage); mainAppDiv.style.backgroundImage=`url('${backgroundImage}')`; }; reader.readAsDataURL(f); } };
+    document.getElementById("fullscreenToggle").onclick = () => { if(!document.fullscreenElement) document.documentElement.requestFullscreen(); else document.exitFullscreen(); };
+    document.getElementById("addSubAccountBtn").onclick = () => { if(currentUser?.username===MAIN_ACCOUNT.username) document.getElementById("subAccountModal").style.display="flex"; else alert("⚠️ فقط المدير العام"); };
+    document.getElementById("saveSubAccountBtn").onclick = () => { const name=document.getElementById("subName").value.trim(), user=document.getElementById("subUsername").value.trim(), pass=document.getElementById("subPassword").value, confirm=document.getElementById("subConfirmPassword").value, role=document.getElementById("subRole").value; if(!name||!user||!pass){alert("املأ الحقول");return;} if(pass!==confirm){alert("كلمة المرور غير متطابقة");return;} if(pass.length<4){alert("كلمة المرور 4 أحرف على الأقل");return;} addSubAccount(name,user,pass,role); document.getElementById("subAccountModal").style.display="none"; ["subName","subUsername","subPassword","subConfirmPassword"].forEach(id=>document.getElementById(id).value=""); };
+    document.getElementById("listSubAccountsBtn").onclick = () => { if(currentUser?.username===MAIN_ACCOUNT.username) showAllSubAccounts(); else alert("⚠️ فقط المدير العام"); };
+    document.getElementById("closeSubModal").onclick = () => document.getElementById("subAccountModal").style.display = "none";
+    document.getElementById("closeListModal").onclick = () => document.getElementById("listAccountsModal").style.display = "none";
+    document.getElementById("addCampInfoBtn").onclick = () => { document.getElementById("campName").value = campData.name || ""; document.getElementById("campManager").value = campData.manager || ""; document.getElementById("campPhone").value = campData.phone || ""; document.getElementById("campInfoModal").style.display = "flex"; };
+    document.getElementById("saveCampInfoBtn").onclick = () => { const n=document.getElementById("campName").value, m=document.getElementById("campManager").value, p=document.getElementById("campPhone").value, logoFile=document.getElementById("campLogoUpload").files[0]; if(n) campData.name=n; if(m) campData.manager=m; if(p) campData.phone=p; if(logoFile){ const reader=new FileReader(); reader.onload=e=>{ campData.logo=e.target.result; autoSave(); loadCampDataToUI(); }; reader.readAsDataURL(logoFile); } else { autoSave(); loadCampDataToUI(); } document.getElementById("campInfoModal").style.display="none"; };
+    document.getElementById("closeCampModal").onclick = () => document.getElementById("campInfoModal").style.display = "none";
+    
+    loadSubAccountsFromCloud();
+    if(!localStorage.getItem("subAccounts")) localStorage.setItem("subAccounts","[]");
+    applySettings();
+    window.addEventListener("beforeunload",()=>{ if(currentUser) autoSave(); });
+</script>
 </body>
 </html>
-    <script  src="./script.js"></script>
-
+    
   </body>
   
 </html>
